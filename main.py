@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 import sqlite3
 import os
 import unittest
+
 DB_NAME = 'flowershop.db'
 SCHEMA = 'flowershop_schema.sql'
 
