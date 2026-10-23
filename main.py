@@ -20,7 +20,7 @@ def init_db():
             conn.execute("INSERT INTO products (name, category, price, quantity) VALUES ('Роза', 'Цветы', 250, 100)")
             conn.execute("INSERT INTO customers (full_name, phone) VALUES ('Иванов Иван', '+79001112233')")
 
-
+# --- ФУНКЦИИ БАЗЫ (Бизнес-логика) ---
 def add_product(name, cat, price, qty):
     with get_conn() as c:
         c.execute("INSERT INTO products (name, category, price, quantity) VALUES (?,?,?,?)", (name, cat, price, qty))
@@ -39,12 +39,12 @@ def get_customers():
 
 def create_order(cust_id, prod_id, qty):
     with get_conn() as c:
-        # Создаем шапку заказа
+    
         cur = c.execute("INSERT INTO orders (customer_id) VALUES (?)", (cust_id,))
         order_id = cur.lastrowid
-        # Получаем цену
+      
         price = c.execute("SELECT price FROM products WHERE id=?", (prod_id,)).fetchone()[0]
-        # Добавляем позицию (триггер сам спишет остаток)
+       
         c.execute("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?,?,?,?)", 
                   (order_id, prod_id, qty, price))
 
@@ -143,10 +143,10 @@ class App:
         for i in self.tree3.get_children(): self.tree3.delete(i)
         for row in get_orders(): self.tree3.insert('', 'end', values=row)
 
-# --- ВСТРОЕННЫЕ ТЕСТЫ (Этап 3) ---
+
 class TestApp(unittest.TestCase):
     def setUp(self):
-        # Используем тестовую БД в памяти
+       
         self.old_db = DB_NAME
         globals()['DB_NAME'] = ':memory:'
         init_db()
@@ -156,12 +156,12 @@ class TestApp(unittest.TestCase):
 
     def test_add_product(self):
         add_product('Тест', 'Цветы', 100, 10)
-        self.assertEqual(len(get_products()), 2) # 1 стартовая + 1 новая
+        self.assertEqual(len(get_products()), 2) 
 
     def test_order_trigger(self):
-        # Изначально 100 роз
+     
         create_order(1, 1, 5) 
-        # Остаток должен стать 95 (триггер сработал)
+        
         prods = get_products()
         self.assertEqual(prods[0][4], 95)
 
